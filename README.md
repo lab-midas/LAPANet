@@ -15,7 +15,7 @@ Image registration is traditionally performed in the image domain. However, high
 
 **LAPANet** addresses this problem by performing non-rigid registration **directly in the acquired k-space**, avoiding the need to reconstruct an image solely for motion estimation.
 
-The method combines the **Local-All-Pass (LAP)** formulation of non-rigid motion with a multi-scale attention-based neural network to estimate dense motion fields from complex-valued, multi-coil k-space data.
+The method realizes the **Local-All-Pass (LAP)** formulation of non-rigid motion with a multi-scale attention-based neural network to estimate dense motion fields from complex-valued, multi-coil k-space data.
 
 LAPANet is designed for highly time-resolved MRI applications where motion needs to be estimated from only a small number of acquired k-space samples per frame.
 

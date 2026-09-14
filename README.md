@@ -123,7 +123,7 @@ publicly available** due to institutional data-sharing restrictions.
 
 To make the training pipeline reproducible without relying on our internal data,
 this repository includes a data loader for the publicly available
-[**CMRxRecon 2023 challenge dataset**](https://www.smicmrxrecon.com/), which
+[**CMRxRecon 2023 challenge dataset**](https://cmrxrecon.github.io/Home.html), which
 uses the same multi-coil, time-resolved cine MRI format. CMRxRecon provides
 **Cartesian** cine acquisitions at multiple acceleration factors (4×, 8×, 10×)
 together with fully sampled references. This allows the k-space registration

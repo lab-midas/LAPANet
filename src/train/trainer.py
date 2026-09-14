@@ -56,6 +56,9 @@ class LAPANet2DTrainer(object):
             print(f'  {k:<18}: {v}')
         print('=' * 60)
 
+        if self.mode == 'train':
+            self.log_wandb()
+
         # Build the model, dataloader, optimizer/scheduler and loss
         self.read_model()
         self.read_loader()
@@ -287,11 +290,10 @@ class LAPANet2DTrainer(object):
             FREQ_save = 1
 
         elif self.mode == 'train':
-            self.log_wandb()
             FREQ = self.args_experiment.log_freq
             FREQ_save = self.args_experiment.save_freq
-            # Build nested output directory: save_model/project/group/experiment
-            self.save_dir = os.path.join(self.args_experiment.save_model,
+            # Build nested output directory: save_dir/project/group/experiment
+            self.save_dir = os.path.join(self.args_experiment.save_dir,
                                          self.args_experiment.project_name,
                                          self.args_experiment.group_name,
                                          self.args_experiment.experiment_name)

@@ -1,3 +1,4 @@
 config_files
 **/__pycache__/
 *.pyc
+**/wandb/

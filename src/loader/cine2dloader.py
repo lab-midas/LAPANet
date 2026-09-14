@@ -203,7 +203,7 @@ class CMRxReconCine2DDataset(Dataset):
         self.subject_list = getattr(config, 'subject_list', None)
         self.pair_frames = getattr(config, 'pair_frames', False)
 
-        self.data_amount = 2 if config.mode == 'debug' else 20000000
+        self.data_amount = 128 if config.mode == 'debug' else 20000000
 
         # ---- state ---------------------------------------------------------
         self.list_info = []
@@ -279,7 +279,7 @@ class CMRxReconCine2DDataset(Dataset):
         n = 0
         n_skipped = 0
         for subj_id in subj_ids:
-            if n > self.data_amount - 1:
+            if len(self.list_info) >= self.data_amount - 1:
                 break
 
             acc_to_views = subjects[subj_id]   # {4: {'sax': path}, 'full': {...}}
@@ -301,13 +301,13 @@ class CMRxReconCine2DDataset(Dataset):
                               else [random.choice(available_accs)])
 
             for acc in accs_this_subj:
-                if n > self.data_amount - 1:
+                if len(self.list_info) >= self.data_amount - 1:
                     break
 
                 # Pick one view per (subject, acc). If 'both', try both views.
                 views_here = self._views_to_load()
                 for view in views_here:
-                    if n > self.data_amount - 1:
+                    if len(self.list_info) >= self.data_amount - 1:
                         break
                     try:
                         ok = self._load_one(subj_id, acc, view,
@@ -409,6 +409,7 @@ class CMRxReconCine2DDataset(Dataset):
         self.box_list.append(box)
 
         self.fill_lists(idx)
+
         return True
 
     # ------------------------------------------------------------------

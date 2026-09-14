@@ -5,7 +5,7 @@
 Official implementation of **LAPANet**, a deep learning framework for non-rigid
 motion estimation directly from accelerated MRI k-space data.
 
-Accepted for publication in **Medical Image Analysis**.
+08.09.2026: Accepted for publication in [**Medical Image Analysis**](https://doi.org/10.1016/j.media.2026.104296)
 
 > 🚧 **Code release in progress.**
 > This repository currently contains the model and training pipeline. Data

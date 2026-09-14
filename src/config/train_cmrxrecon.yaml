@@ -1,0 +1,14 @@
+"""
+@author: Aya
+
+script for Local All Pass Attention Network (LAPANet)
+
+Developed at the University Hospital of Tübingen.
+Copyright © 2026 University Hospital of Tübingen.
+
+If you'd like to use or share this code, please get in touch with
+Aya Ghoul <aya.ghoul@med.uni-tuebingen.de>.
+"""
+mode: &mode_exp 'debug'
+num_gpu: "3"
+

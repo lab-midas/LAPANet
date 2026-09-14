@@ -200,6 +200,7 @@ class CMRxReconCine2DDataset(Dataset):
         # ---- CMRxRecon-specific config -------------------------------------
         self.view = getattr(config, 'view', 'sax')          # 'sax'|'lax'|'both'
         self.use_all_accelerations = getattr(config, 'use_all_accelerations', False)
+        self.n_accelerations = getattr(config, 'n_accelerations', 1)
         self.subject_list = getattr(config, 'subject_list', None)
         self.pair_frames = getattr(config, 'pair_frames', False)
 
@@ -292,13 +293,21 @@ class CMRxReconCine2DDataset(Dataset):
                 available_accs.append('full')
             available_accs = list(dict.fromkeys(available_accs))
 
+            # Number of random accelerations to pick
+            n_accs = self.n_accelerations
+
             if not available_accs:
                 print(f'[CMRxRecon] skip {subj_id}: no matching acceleration '
                       f'(have {list(acc_to_views.keys())})')
                 continue
 
-            accs_this_subj = (available_accs if self.use_all_accelerations
-                              else [random.choice(available_accs)])
+            # Select all, or pick 'n' unique accelerations safely
+            if self.use_all_accelerations:
+                accs_this_subj = available_accs
+            else:
+                # min() prevents ValueError if len(available_accs) < n_accs
+                k = min(n_accs, len(available_accs))
+                accs_this_subj = random.sample(available_accs, k)
 
             for acc in accs_this_subj:
                 if len(self.list_info) >= self.data_amount - 1:

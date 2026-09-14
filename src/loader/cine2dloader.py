@@ -203,7 +203,7 @@ class CMRxReconCine2DDataset(Dataset):
         self.subject_list = getattr(config, 'subject_list', None)
         self.pair_frames = getattr(config, 'pair_frames', False)
 
-        self.data_amount = 2 if config.mode == 'debug' else 200
+        self.data_amount = 2 if config.mode == 'debug' else 20000000
 
         # ---- state ---------------------------------------------------------
         self.list_info = []
@@ -447,24 +447,15 @@ class CMRxReconCine2DDataset(Dataset):
         n_frames = self.img_fully_list[index_us].shape[2]
 
         for z in range(n_slices):
-            if self.pair_frames:
-                for t1 in range(n_frames):
-                    for t2 in range(n_frames):
-                        if len(self.list_info) >= self.data_amount:
-                            return
-                        self.list_info.append({
+            for t1 in range(n_frames):
+                for t2 in range(n_frames):
+                    if len(self.list_info) >= self.data_amount:
+                        return
+                    self.list_info.append({
                             'img_us_idx': index_us,
                             'img_idx': index_us,
                             'z': z, 't1': t1, 't2': t2,
                         })
-            else:
-                if len(self.list_info) >= self.data_amount:
-                    return
-                self.list_info.append({
-                    'img_us_idx': index_us,
-                    'img_idx': index_us,
-                    'z': z, 't1': 0, 't2': 0,
-                })
 
     # ------------------------------------------------------------------
     # __getitem__

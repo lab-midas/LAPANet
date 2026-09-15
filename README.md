@@ -181,6 +181,73 @@ python path/to/project/src/scripts/run_cmrxrecon.py --data_dir /path/to/CMRxReco
 
 ---
 
+## How to use the HuggingFace App
+
+Upload a **5D k-space file** with shape `(Frames, Slices, Coils, H, W)`, pick a
+fixed and a moving frame, and get a color-coded cardiac motion field.
+
+### 1. Prepare your input
+
+The app expects complex-valued k-space in one of these formats:
+
+| Extension | Layout | Notes |
+|---|---|---|
+| `.npy` / `.npz` | `(F, S, C, H, W)` | `np.complex64` or `np.complex128` |
+| `.h5` / `.hdf5` | `(F, S, C, H, W)` | dataset named `kspace`, `kspace_full`, or similar |
+| `.mat` | `(F, S, C, H, W)` | MATLAB v7.3 (HDF5) compound `real`/`imag` dtype |
+
+- `F` — frames (time points)
+- `S` — slices
+- `C` — coils (must be **10**)
+- `H`, `W` — spatial dimensions
+
+The file details panel updates automatically after upload and shows you the
+detected shape and axis sizes, so you can verify before running.
+
+### 2. Pick a frame pair
+
+Two pairs of indices define the two inputs:
+
+| Control | Meaning | Typical value |
+|---|---|---|
+| `z1` | slice index of the **fixed** input | `0` |
+| `t1` | frame index of the **fixed** input | `0` |
+| `z2` | slice index of the **moving** input | `0` |
+| `t2` | frame index of the **moving** input | `t1 + 1` |
+
+All indices are **0-based**. For cardiac motion, use adjacent frames
+(`t2 = t1 + 1`) in the same slice (`z1 = z2`). Cross-slice registration is
+possible but represents a different problem.
+
+### 3. Run and read the output
+
+Click **Run Motion Estimation**. You get four views:
+
+- **Inputs** — coil-combined magnitude images of the fixed and moving frames
+  (`ifft2c` → sum over coils → `abs`, normalized to `[0, 1]`).
+- **Flow · color** — the estimated motion field, HSV-encoded via
+  [`flow_vis`](https://github.com/tomrunia/OpticalFlow_Visualization):
+  hue = direction, saturation/brightness = magnitude.
+- **Flow · quiver** — the same field as arrows on a black background.
+  Tune *arrow spacing* and *arrow scale* under "Quiver settings".
+
+Every panel can be downloaded as a PNG.
+
+### 4. Tips and troubleshooting
+
+- **Wrong axis order?** Verify with `np.shape(kspace)` locally — the app
+  requires exactly 5 dimensions and will reject anything else.
+- **Coil count mismatch?** The model was trained on 10 coils; pad or
+  coil-compress your data before uploading.
+
+---
+## Inference on Jupyter
+
+A step-by-step Jupyter notebook reproducing the whole pipeline, loading,
+preprocessing, forward pass, and flow visualisation, is available at
+[`notebooks/inference.ipynb`](<URL_TO_NOTEBOOK>).
+---
+
 ## Code Availability
 
 The implementation is currently being prepared for public release.
@@ -190,9 +257,11 @@ The repository will include:
 * [x] LAPANet model implementation
 * [x] Training scripts
 * [x] CMRxRecon data loader (public example)
-* [ ] Huggingface interface / model weights
-* [ ] Evaluation scripts
-* [ ] Configuration files
+* [x] Huggingface model weights
+* [x] Evaluation scripts
+* [x] Configuration files
+* [ ] Huggingface space
+* [ ] Final checkpoint upload
 
 **The code will be completed shortly.**
 

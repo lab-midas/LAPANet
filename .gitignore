@@ -3,3 +3,6 @@ configs
 *.pyc
 **/wandb/
 data
+# Jupyter
+.ipynb_checkpoints/
+**/.ipynb_checkpoints/

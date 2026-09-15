@@ -12,6 +12,12 @@
 
 **LAPANet** is a deep learning framework for **non-rigid motion estimation directly from accelerated MRI k-space data**, bypassing image reconstruction. This approach enables accurate motion estimation at **sub-5 millisecond temporal resolution** with as few as **2 Cartesian k-space lines per frame** or **3 radial spokes per frame**, making it ideal for dynamic and real-time MRI applications.
 
+:sparkles: **New Updates.**
+
+- :hourglass_flowing_sand: Trained weights coming soon on HuggingFace
+- :rocket: Code Available for training and inference using the CMRxRecon dataset
+- :tada: Paper got accepted at Medical Image Analysis: https://doi.org/10.1016/j.media.2026.104296
+
 ### Why k-Space Registration?
 
 Highly accelerated MRI reconstructions suffer from severe undersampling artifacts and aliasing that degrade image quality and disrupt feature matching. By operating directly on acquired Fourier measurements, LAPANet estimates motion **before image reconstruction**, avoiding reliance on aliased images and enabling reliable motion estimation under extreme acceleration.
@@ -48,6 +54,11 @@ Highly accelerated MRI reconstructions suffer from severe undersampling artifact
 - **Motion Attention Modules** — Progressive refinement across scales
 - **k-Space Magnitude Consistency Loss** — Global structural guidance
 - **Efficient Architecture** — 4000× speedup vs. prior LAP-based methods
+
+<p align="center">
+  <img src="figures/architecture.png" alt="LAPANet Architecture" width="800"><br>
+  <em> Overview of the LAPANet architecture</em>
+</p>
 
 ---
 

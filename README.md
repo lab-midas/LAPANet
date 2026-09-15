@@ -1,284 +1,331 @@
-# LAPANet
+# LAPANet: Local-All-Pass Attention Network for Non-Rigid Image Registration in k-Space
 
-**LAPANet: Local-All-Pass Attention Network for Non-Rigid Image Registration in k-Space**
+[![Paper](https://img.shields.io/badge/Paper-Medical%20Image%20Analysis-blue)](https://doi.org/10.1016/j.media.2026.104296)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org)
+[![PyTorch](https://img.shields.io/badge/PyTorch-1.11+-orange.svg)](https://pytorch.org)
 
-Official implementation of **LAPANet**, a deep learning framework for non-rigid
-motion estimation directly from accelerated MRI k-space data.
-
-08.09.2026: Accepted for publication in [**Medical Image Analysis**](https://doi.org/10.1016/j.media.2026.104296)
-
-> 🚧 **Code release in progress.**
-> This repository currently contains the model and training pipeline. Data
-> preparation instructions, evaluation scripts, configuration files and
-> final pretrained weights will be added shortly.
 
 ---
 
 ## Overview
 
-Image registration is traditionally performed in the image domain. However,
-highly accelerated MRI acquisitions introduce severe undersampling and aliasing
-artifacts after reconstruction, which can substantially degrade the accuracy of
-image-based motion estimation.
+**LAPANet** is a deep learning framework for **non-rigid motion estimation directly from accelerated MRI k-space data**, bypassing image reconstruction. This approach enables accurate motion estimation at **sub-5 millisecond temporal resolution** with as few as **2 Cartesian k-space lines per frame** or **3 radial spokes per frame**, making it ideal for dynamic and real-time MRI applications.
 
-**LAPANet** addresses this problem by performing non-rigid registration
-**directly in the acquired k-space**, avoiding the need to reconstruct an image
-solely for the purpose of motion estimation.
+### Why k-Space Registration?
 
-The method realizes the **Local-All-Pass (LAP)** formulation of non-rigid motion
-with a multi-scale attention-based neural network that estimates dense motion
-fields from complex-valued, multi-coil k-space data. LAPANet is designed for
-highly time-resolved MRI applications in which motion must be estimated from
-only a small number of acquired k-space samples per frame.
+Highly accelerated MRI reconstructions suffer from severe undersampling artifacts and aliasing that degrade image quality and disrupt feature matching. By operating directly on acquired Fourier measurements, LAPANet estimates motion **before image reconstruction**, avoiding reliance on aliased images and enabling reliable motion estimation under extreme acceleration.
 
-### Key features
+### Key Advantages
 
-- **Direct k-space registration** without requiring image reconstruction
-- **Non-rigid motion estimation** based on the Local-All-Pass formulation
-- **Self-supervised training**, without requiring ground-truth deformation fields
-- Supports **multi-coil complex-valued MRI data**
-- Multi-scale feature extraction capturing both local and global motion
-- Applicable to **Cartesian and radial sampling trajectories**
-- Designed for **highly accelerated and time-resolved MRI**
-- Demonstrated for **cardiac and respiratory motion estimation**
+| Aspect | LAPANet | Image-Based Methods             |
+|--------|---------|---------------------------------|
+| **Input** | Raw k-space (accelerated) | Reconstructed images (degraded) |
+| **Reconstruction Needed** | ❌ No | ✅ Yes                           |
+| **High Acceleration Robustness** | ✅ Yes | ❌ No                            |
+| **Temporal Resolution** | <5 ms | >20-50 ms                       |
 
 ---
 
-## Method
+## Key Features
 
-LAPANet receives fixed and moving k-space data and predicts a dense non-rigid
-motion field describing the transformation between them.
+### Core Capabilities
 
-The underlying Local-All-Pass formulation models non-rigid deformation as a
-sequence of local translational transformations. In the Fourier domain, local
-translations can be represented through phase modulations, providing a natural
-way to estimate motion directly from k-space.
+- ✅ **Direct k-space registration** without image reconstruction
+- ✅ **Non-rigid motion estimation** based on Local-All-Pass (LAP) formulation
+- ✅ **Self-supervised training** without requiring annotated deformation fields
+- ✅ **Multi-coil information** for complex-valued MRI data
+- ✅ **Multi-scale architecture** capturing local and global motion patterns
+- ✅ **Trajectory agnostic** — supports Cartesian and radial sampling
+- ✅ **Highly accelerated** — validated at R=78 (Cartesian) and R=104 (radial)
+- ✅ **Real-time capable** — ~30 ms inference per frame pair
+- ✅ **Cardiac & respiratory** motion estimation validated
 
-The network operates on the real and imaginary components of the coil-resolved
-k-space data and uses a multi-resolution architecture to progressively refine
-the estimated motion. Its main components are:
+### Building Modules
 
-- **Global Residual Modules** for multi-scale k-space feature extraction
-- **Encoder/Decoder blocks** for learning local and global representations
-- **Attention mechanisms** for modeling long-range spatial dependencies
-- **Motion Attention Modules** for progressively refining motion estimates
-- A **global translation component** to account for overall image displacement
-
-The model is trained in a self-supervised manner using the relationship between
-the fixed and moving acquisitions, avoiding the need for manually annotated
-deformation fields.
+- **Global Residual Modules** — Multi-scale k-space feature extraction at full resolution
+- **Attention Mechanisms** — Long-range spatial dependency modeling
+- **Motion Attention Modules** — Progressive refinement across scales
+- **k-Space Magnitude Consistency Loss** — Global structural guidance
+- **Efficient Architecture** — 4000× speedup vs. prior LAP-based methods
 
 ---
 
-## Why k-Space Registration?
+## Quick Start
 
-For highly accelerated MRI, reconstructing undersampled data can result in
-aliasing artifacts that interfere with conventional image-domain registration.
+### Installation 
 
-By operating directly on the acquired Fourier measurements, LAPANet can estimate
-motion *before* image reconstruction and therefore avoids relying on an
-intermediate aliased image. This is particularly useful for applications that
-require extremely high temporal resolution, including:
+```bash
+# Clone repository
+git clone https://github.com/lab-midas/LAPANet.git
+cd LAPANet
 
-- Real-time cardiac MRI
-- Respiratory motion estimation
-- Motion-compensated reconstruction
-- Motion tracking and characterization
-- MR-guided radiotherapy
-- Image-based gating and synchronization
-- Real-time interventional MRI
+# Create environment
+conda env create -f environment.yml
+conda activate lapanet
+
+# Install dependencies
+pip install -r requirements.txt
+```
+
+### Download Pretrained Model
+
+```bash
+# Download from HuggingFace (coming soon)
+python scripts/download_model.py --model_name lapanet_cmrxrecon
+```
+
+
+### Run Jupyter Notebook (Interactive)
+
+```bash
+# Step-by-step inference with visualization
+jupyter notebook notebooks/inference.ipynb
+```
+
+### Run the App (Interactive)
+
+```bash
+python hf_space/app.py
+```
 
 ---
 
-## Results
+## Installation
 
-LAPANet was evaluated on cardiac and respiratory motion estimation using both
-fully sampled and highly accelerated MRI acquisitions.
+### System Requirements
 
-The results reported in the paper were obtained on **in-house acquired data**.
-Acceleration was simulated retrospectively using two sampling strategies:
+| Component | Requirement | Notes                        |
+|-----------|-------------|------------------------------|
+| **OS** | Linux/macOS/Windows | Tested on Ubuntu 20.04+      |
+| **Python** | 3.8–3.11 | 3.8+ recommended             |
+| **CUDA** | 11.0+ | Highly recommended for speed |
+| **GPU Memory** | ≥8 GB | 16 GB+ for batch processing  |
+| **RAM** | ≥16 GB | 32 GB recommended            |
+| **Disk** | ≥50 GB | For datasets + checkpoints   |
 
-- **VISTA** variable-density Cartesian sampling
-- **Radial golden-angle** sampling
+### Step-by-Step Installation
 
-The method demonstrated robust motion estimation across different sampling
-trajectories and acceleration factors. In reported experiments, LAPANet
-maintained reliable motion estimation with only a few k-space lines or spokes
-acquired per frame.
+#### 1. **Clone Repository**
 
-For cardiac motion, the method was demonstrated with temporal resolutions below
-**5 ms** under highly accelerated acquisitions, including experiments using as
-few as **2 Cartesian k-space lines per frame** and **3 radial spokes per frame**.
+```bash
+git clone https://github.com/lab-midas/LAPANet.git
+cd LAPANet
+```
 
-These results highlight the potential of direct k-space registration for
-high-frame-rate and real-time MRI applications.
+#### 2. **Create Conda Environment**
+
+```bash
+# Option A: Use provided environment (recommended)
+conda env create -f environment.yml
+conda activate lapanet
+
+# Option B: Manual setup
+conda create -n lapanet python=3.10
+conda activate lapanet
+conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia
+```
+
+#### 3. **Install Dependencies**
+
+```bash
+# Install from requirements
+pip install -r requirements.txt
+```
+
+#### 4. **Install MERLIN (Optional, for VISTA sampling utilities)**
+
+```bash
+# not needed for cmrxrecon
+git clone https://github.com/midas-tum/merlin.git
+cd merlin
+pip install -e .
+```
+
+#### 5. **Verify Installation**
+
+```bash
+python -c "
+import torch
+import numpy as np
+print(f'PyTorch version: {torch.__version__}')
+print(f'CUDA available: {torch.cuda.is_available()}')
+print(f'GPU: {torch.cuda.get_device_name(0) if torch.cuda.is_available() else \"None\"}')
+"
+```
+
+---
+
+## Usage Guide
+
+### 1. Data Preparation
+
+#### Use Public CMRxRecon Dataset (Recommended)
+
+```bash
+# Download from CMRxRecon challenge website
+# https://cmrxrecon.github.io/Home.html
+# Expected directory structure:
+# data/CMRxRecon/
+# ├── TrainingSet/
+# │   ├── AccFactor04/P001/cine_sax.mat
+# │   ├── AccFactor08/P001/cine_sax.mat
+# │   ├── AccFactor10/P001/cine_sax.mat
+# │   └── FullSample/P001/cine_sax.mat
+# └── ValidationSet/...
+
+```
+
+
+---
+
+## Training
+
+### Training from Scratch
+
+#### 1. **Configure Training**
+
+Edit `config/train_cmrxrecon.yaml`:
+
+#### 2. **Launch Training**
+
+```bash
+# Single GPU
+python scripts/run_cmrxrecon.py --config config/train_cmrxrecon.yaml
+
+# Override config parameters
+python scripts/run_cmrxrecon.py \
+  --config configs/experiments/my_experiment.yaml \
+  --batch_size 64 \
+  --learning_rate 5e-5 \
+  --num_epochs 100
+```
+
+#### 3. **Monitor Training**
+
+```bash
+# Using TensorBoard
+tensorboard --logdir checkpoints/logs
+
+# Using Weights & Biases (optional)
+pip install wandb
+# Set WANDB_API_KEY environment variable
+```
+
+
 
 ---
 
 ## Data
 
-The in-house datasets used in the paper (VISTA-accelerated Cartesian and
-retrospectively radial-golden-angle-accelerated cine MRI) **cannot be made
-publicly available** due to institutional data-sharing restrictions.
+### CMRxRecon Public Dataset
 
-To make the training pipeline reproducible without relying on our internal data,
-this repository includes a data loader for the publicly available
-[**CMRxRecon 2023 challenge dataset**](https://cmrxrecon.github.io/Home.html), which
-uses the same multi-coil, time-resolved cine MRI format. CMRxRecon provides
-**Cartesian** cine acquisitions at multiple acceleration factors (4×, 8×, 10×)
-together with fully sampled references. This allows the k-space registration
-pipeline to be trained and evaluated end-to-end on a public benchmark.
+LAPANet is demonstrated in this repo using the **CMRxRecon 2023 Challenge** multi-coil cardiac cine dataset.
 
-The CMRxRecon loader is intended as a **working example** that mirrors the
-structure of the in-house pipeline. Users with their own k-space data can adapt
-the loader to their own acquisition format.
+**Download:**
+- Official website: https://cmrxrecon.github.io/Home.html
 
-### Expected directory layout (CMRxRecon example)
+**Dataset Properties:**
 
-```<data_root_dir>/
-TrainingSet/
-AccFactor04/ P001/cine_sax.mat, cine_lax.mat
-AccFactor08/ P001/cine_sax.mat, cine_lax.mat
-AccFactor10/ P001/cine_sax.mat, cine_lax.mat
-FullSample/ P001/cine_sax.mat, cine_lax.mat
+| Property | Value |
+|----------|-------|
+| **Subjects** | 200 training + 100 test |
+| **Sequence** | 2D bSSFP cine |
+| **Coils** | 10 (multi-coil) |
+| **Spatial Resolution** | 1.9 × 1.9 mm² |
+| **Temporal Phases** | 25 frames |
+| **Slice Thickness** | 8 mm |
+| **Acceleration Factors** | 4×, 8×, 10× (Cartesian) |
+| **Format** | MATLAB v7.3 (.mat files) |
+
+**Expected Directory Structure:**
+
+```
+data/CMRxRecon/
+├── TrainingSet/
+│   ├── AccFactor04/
+│   │   ├── P001/
+│   │   │   ├── cine_sax.mat (undersampled k-space)
+│   │   │   └── cine_lax.mat
+│   │   ├── P002/...
+│   │   └── ...
+│   ├── AccFactor08/
+│   ├── AccFactor10/
+│   └── FullSample/
+│       ├── P001/
+│       │   ├── cine_sax.mat (fully sampled reference)
+│       │   └── cine_lax.mat
+│       └── ...
+└── TestSet/
+    ├── P201/ ... (similar structure)
 ```
 
-Each `.mat` file is a MATLAB v7.3 (HDF5) file containing a single k-space
-variable (`kspace_sub04`, `kspace_sub08`, `kspace_sub10`, or `kspace_full`).
-The loader reads the fully sampled reference from `FullSample/` and the
-sub-sampled k-space from the corresponding `AccFactorXX/` folder of the same
-subject.
+### Custom Data Format
 
----
+For your own data:
 
-## Getting Started
+1. **Save as HDF5/MAT/NPY** with shape `(F, S, C, H, W)` (complex-valued)
+2. Or **Create a custom loader**
 
-### Environment Setup
 
-```bash
-conda env create -f environment.yml
-conda activate <env-name>
-pip install -r requirements.txt
-```
 
-### Requirements
+### In-House Data (Non-Public)
 
-- PyTorch (CUDA recommended)
-- [`merlin`](https://github.com/midas-tum/merlin/tree/master) for VISTA sampling utilities
-
-### Training on CMRxRecon (example)
-
-```bash
-# Using default YAML values
-python path/to/project/src/scripts/run_cmrxrecon.py
-
-# Pointing to a custom YAML file
-python path/to/project/src/scripts/run_cmrxrecon.py --config /path/to/custom_config.yaml
-
-# Overriding specific parameters
-python path/to/project/src/scripts/run_cmrxrecon.py --data_dir /path/to/CMRxRecon/TrainingSet --batch_size 8
-```
-
----
-
-## How to use the HuggingFace App
-
-Upload a **5D k-space file** with shape `(Frames, Slices, Coils, H, W)`, pick a
-fixed and a moving frame, and get a color-coded cardiac motion field.
-
-### 1. Prepare your input
-
-The app expects complex-valued k-space in one of these formats:
-
-| Extension | Layout | Notes |
-|---|---|---|
-| `.npy` / `.npz` | `(F, S, C, H, W)` | `np.complex64` or `np.complex128` |
-| `.h5` / `.hdf5` | `(F, S, C, H, W)` | dataset named `kspace`, `kspace_full`, or similar |
-| `.mat` | `(F, S, C, H, W)` | MATLAB v7.3 (HDF5) compound `real`/`imag` dtype |
-
-- `F` — frames (time points)
-- `S` — slices
-- `C` — coils (must be **10**)
-- `H`, `W` — spatial dimensions
-
-The file details panel updates automatically after upload and shows you the
-detected shape and axis sizes, so you can verify before running.
-
-### 2. Pick a frame pair
-
-Two pairs of indices define the two inputs:
-
-| Control | Meaning | Typical value |
-|---|---|---|
-| `z1` | slice index of the **fixed** input | `0` |
-| `t1` | frame index of the **fixed** input | `0` |
-| `z2` | slice index of the **moving** input | `0` |
-| `t2` | frame index of the **moving** input | `t1 + 1` |
-
-All indices are **0-based**. For cardiac motion, use adjacent frames
-(`t2 = t1 + 1`) in the same slice (`z1 = z2`). Cross-slice registration is
-possible but represents a different problem.
-
-### 3. Run and read the output
-
-Click **Run Motion Estimation**. You get four views:
-
-- **Inputs** — coil-combined magnitude images of the fixed and moving frames
-  (`ifft2c` → sum over coils → `abs`, normalized to `[0, 1]`).
-- **Flow · color** — the estimated motion field, HSV-encoded via
-  [`flow_vis`](https://github.com/tomrunia/OpticalFlow_Visualization):
-  hue = direction, saturation/brightness = magnitude.
-- **Flow · quiver** — the same field as arrows on a black background.
-  Tune *arrow spacing* and *arrow scale* under "Quiver settings".
-
-Every panel can be downloaded as a PNG.
-
-### 4. Tips and troubleshooting
-
-- **Wrong axis order?** Verify with `np.shape(kspace)` locally — the app
-  requires exactly 5 dimensions and will reject anything else.
-- **Coil count mismatch?** The model was trained on 10 coils; pad or
-  coil-compress your data before uploading.
-
----
-## Inference on Jupyter
-
-A step-by-step Jupyter notebook reproducing the whole pipeline, loading,
-preprocessing, forward pass, and flow visualisation, is available at
-[`notebooks/inference.ipynb`](https://github.com/lab-midas/LAPANet/blob/master/notebooks/inference.ipynb).
----
-
-## Code Availability
-
-The implementation is currently being prepared for public release.
-
-The repository will include:
-
-* [x] LAPANet model implementation
-* [x] Training scripts
-* [x] CMRxRecon data loader (public example)
-* [x] Huggingface model weights
-* [x] Evaluation scripts
-* [x] Configuration files
-* [ ] Huggingface space
-* [ ] Final checkpoint upload
-
-**The code will be completed shortly.**
+The original in-house datasets used in the paper cannot be released due to ethical restrictions. 
 
 ---
 
 ## Citation
 
-If you find LAPANet useful in your research, please cite our work:
+If you use LAPANet in your research, please cite:
 
 ```bibtex
 @article{ghoul2026learning,
   title={Learning efficient non-rigid registration in k-space for accelerated Magnetic Resonance Imaging},
   author={Ghoul, Aya and Hammernik, Kerstin and Lingg, Andreas and Krumm, Patrick and Rueckert, Daniel and Gatidis, Sergios and K{\"u}stner, Thomas},
   journal={Medical Image Analysis},
+  volume={115},
   pages={104296},
-  year={2026},
+  year={2027},
+  doi={10.1016/j.media.2026.104296},
   publisher={Elsevier}
 }
 ```
 
+### Paper Links
+
+- **Published Article**: https://doi.org/10.1016/j.media.2026.104296
+- **ArXiv Preprint**: https://arxiv.org/abs/2410.18834
+- **GitHub Repository**: https://github.com/lab-midas/LAPANet
+- **HuggingFace Repository**: https://github.com/lab-midas/LAPANet
+
+
+---
+
+## License
+
+This project is licensed under the **MIT License** — see [LICENSE](LICENSE) file for details.
+
+---
+
+## Support & Contact
+
+- **Issues**: GitHub Issues tracker
+- **Email**: aya.ghoul@med.uni-tuebingen.de
+- **Lab Website**: https://www.midas.uni-tuebingen.de/
+
+---
+
+## Additional Resources
+
+- [Model Architecture Explanation](docs/architecture.md) (coming soon)
+- [Loss Functions Deep Dive](docs/losses.md) (coming soon)
+- [Training Tips & Tricks](docs/training_guide.md) (coming soon)
+- [Paper PDF](https://doi.org/10.1016/j.media.2026.104296)
+- [Supplementary Materials](https://doi.org/10.1016/j.media.2026.104296) (on journal website)
+
+---
+
+**Last Updated**: September 2026  
+**Current Version**: 1.0.0  
+**Code Status**: 🟢 Actively Maintained

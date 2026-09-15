@@ -1,0 +1,125 @@
+# ==============================================================================
+# LAPANet Configuration File (CMRxRecon Dataset)
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# General / Global Settings
+# ------------------------------------------------------------------------------
+# Execution mode: "train" or "debug"
+mode: &mode_exp "train"
+
+# Target GPU device index (e.g., "0", "1")
+num_gpu: "0"
+
+# ------------------------------------------------------------------------------
+# Data Loading & Preprocessing Settings
+# ------------------------------------------------------------------------------
+Loader:
+  # Path to the CMRxRecon dataset directory
+  data_dir: "/path/to/CMRxRecon/TrainingSet"
+
+  # Dataset type ("cine" or "mapping")
+  dataset_name: "cine"
+
+  # Training batch size per device
+  batch_size: 16
+
+  # Number of receiver coils
+  coils_num: &coils 10
+
+  # Data loader worker threads
+  num_workers: 4
+
+  # Inherits global mode setting
+  mode: *mode_exp
+
+  # Output spatial resolution [Height, Width]
+  out_shape: [192, 192]
+
+  # Optional path to pre-computed bounding boxes (null if unused)
+  bounding_box_dir: null
+
+  # List of undersampling acceleration factors (R)
+  R_list: [1, 4, 8, 10]
+
+  # Number of randomly sampled accelerations per subject during training
+  n_accelerations: 2
+
+  # Whether to sample across all defined acceleration factors
+  use_all_accelerations: true
+
+  # Cardiac view orientation ("sax" for short-axis, "lax" for long-axis, "both" for sax and lax)
+  view: "sax"
+
+# ------------------------------------------------------------------------------
+# Model Architecture Hyperparameters
+# ------------------------------------------------------------------------------
+Model:
+  # Attention heads per layer block
+  att_heads: [1, 1, 1, 1, 1, 1, 1, 1, 1]
+
+  # Feature channel progression for global filter modules
+  global_filters: [4, 16, 32, 128]
+
+  # Feature channel progression for encoder-decoder stages
+  encoder_decoder_filters: [16, 32, 64, 192, 384, 192, 64, 32, 16]
+
+  # Enable intermediate auxiliary outputs/losses
+  deep_supervision: false
+
+  # Whether to estimate spatial translation vectors
+  return_translation: true
+
+  # Apply input phase/spatial shifting
+  shift_input: true
+
+  # Inherits coil count anchor
+  num_coils: *coils
+
+# ------------------------------------------------------------------------------
+# Experiment Tracking & Training Setup
+# ------------------------------------------------------------------------------
+Experiment:
+  # Weights & Biases API Key (pass via environment variable or CLI override for security)
+  wandb_key: "YOUR_WANDB_API_KEY"
+
+  # Logging metadata
+  project_name: "LAPANet"
+  group_name: "YOUR_AWESOME_GROUP"
+  entity: "YOUR_WANDB_ENTITY"
+  experiment_name: "YOUR_AWESOME_IDEA"
+
+  # Path to checkpoint file to resume training (null to train from scratch)
+  checkpoint_path: null
+
+  # Output directory for logs, metrics, and model checkpoints
+  save_dir: "/path/to/output/logs/CMRxRecon"
+
+  # Optimization settings
+  mode: *mode_exp
+  lr: 0.0001
+  epochs: 30
+  wdecay: 0.001
+
+  # Logging and checkpointing frequencies (in iterations)
+  log_freq: 2000
+  save_freq: 20000
+
+# ------------------------------------------------------------------------------
+# Loss Function Configuration
+# ------------------------------------------------------------------------------
+Loss:
+  # Active loss components
+  which: ["photometric_weighted", "smooth"]
+
+  # Weight multipliers applied to each loss component
+  loss_weights: [1.0, 0.01]
+
+  # Weighted Photometric Loss parameters
+  photometric_weighted:
+    alpha: 0.45
+
+  # Smoothness Regularization parameters
+  smooth:
+    boundary_awareness: true
+    alpha: 5

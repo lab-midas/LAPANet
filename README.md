@@ -163,13 +163,14 @@ subject.
 ### Training on CMRxRecon (example)
 
 ```bash
-python src/scripts/run_cmrxrecon.py \
-    --data_dir /path/to/CMRxRecon/TrainingSet \
-    --view sax \
-    --R_list 4 8 10 \
-    --out_shape 512 512 \
-    --batch_size 16 \
-    --num_workers 4
+# Using default YAML values
+python path/to/project/src/scripts/run_cmrxrecon.py
+
+# Pointing to a custom YAML file
+python path/to/project/src/scripts/run_cmrxrecon.py --config /path/to/custom_config.yaml
+
+# Overriding specific parameters
+python path/to/project/src/scripts/run_cmrxrecon.py --data_dir /path/to/CMRxRecon/TrainingSet --batch_size 8
 ```
 
 ---
@@ -183,9 +184,9 @@ The repository will include:
 * [x] LAPANet model implementation
 * [x] Training scripts
 * [x] CMRxRecon data loader (public example)
+* [ ] Huggingface interface / model weights
 * [ ] Evaluation scripts
 * [ ] Configuration files
-* [ ] Pretrained model weights
 
 **The code will be completed shortly.**
 

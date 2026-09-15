@@ -296,8 +296,7 @@ If you use LAPANet in your research, please cite:
 
 - **Published Article**: https://doi.org/10.1016/j.media.2026.104296
 - **ArXiv Preprint**: https://arxiv.org/abs/2410.18834
-- **GitHub Repository**: https://github.com/lab-midas/LAPANet
-- **HuggingFace Repository**: https://github.com/lab-midas/LAPANet
+- **HuggingFace Repository**: https://huggingface.co/AyaGhoul/LAPANet
 
 
 ---
@@ -308,20 +307,14 @@ This project is licensed under the **MIT License** — see [LICENSE](LICENSE) fi
 
 ---
 
-## Support & Contact
-
-- **Issues**: GitHub Issues tracker
+## Contact
 - **Email**: aya.ghoul@med.uni-tuebingen.de
-- **Lab Website**: https://www.midas.uni-tuebingen.de/
+- **Lab Website**: www.midaslab.org
 
 ---
 
 ## Additional Resources
 
-- [Model Architecture Explanation](docs/architecture.md) (coming soon)
-- [Loss Functions Deep Dive](docs/losses.md) (coming soon)
-- [Training Tips & Tricks](docs/training_guide.md) (coming soon)
-- [Paper PDF](https://doi.org/10.1016/j.media.2026.104296)
 - [Supplementary Materials](https://doi.org/10.1016/j.media.2026.104296) (on journal website)
 
 ---

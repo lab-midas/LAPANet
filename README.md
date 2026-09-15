@@ -14,9 +14,9 @@
 
 :sparkles: **New Updates.**
 
-- :hourglass_flowing_sand: Trained weights coming soon on HuggingFace
+- :hourglass_flowing_sand: Pretrained weights coming soon on Hugging Face
 - :rocket: Code Available for training and inference using the CMRxRecon dataset
-- :tada: Paper got accepted at Medical Image Analysis: https://doi.org/10.1016/j.media.2026.104296
+- :tada: Paper accepted at *Medical Image Analysis*: https://doi.org/10.1016/j.media.2026.104296
 
 ### Why k-Space Registration?
 

@@ -10,7 +10,7 @@ motion estimation directly from accelerated MRI k-space data.
 > 🚧 **Code release in progress.**
 > This repository currently contains the model and training pipeline. Data
 > preparation instructions, evaluation scripts, configuration files and
-> pretrained weights will be added shortly.
+> final pretrained weights will be added shortly.
 
 ---
 
@@ -245,7 +245,7 @@ Every panel can be downloaded as a PNG.
 
 A step-by-step Jupyter notebook reproducing the whole pipeline, loading,
 preprocessing, forward pass, and flow visualisation, is available at
-[`notebooks/inference.ipynb`](<URL_TO_NOTEBOOK>).
+[`notebooks/inference.ipynb`](https://github.com/lab-midas/LAPANet/blob/master/notebooks/inference.ipynb).
 ---
 
 ## Code Availability

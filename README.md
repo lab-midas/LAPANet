@@ -153,11 +153,17 @@ subject.
 
 ## Getting Started
 
+### Environment Setup
+
+```bash
+conda env create -f environment.yml
+conda activate <env-name>
+pip install -r requirements.txt
+```
+
 ### Requirements
 
-- Python 3.8+
 - PyTorch (CUDA recommended)
-- `h5py`, `numpy`, `scipy`
 - [`merlin`](https://github.com/midas-tum/merlin/tree/master) for VISTA sampling utilities
 
 ### Training on CMRxRecon (example)
